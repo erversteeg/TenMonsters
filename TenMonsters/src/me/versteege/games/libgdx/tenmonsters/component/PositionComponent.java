@@ -3,6 +3,12 @@ package me.versteege.games.libgdx.tenmonsters.component;
 import com.artemis.Component;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Holds position data for game entities.
+ * @author versteege
+ *
+ */
+
 public class PositionComponent extends Component {
 	private Vector2 mPosition;
 	
@@ -35,11 +41,11 @@ public class PositionComponent extends Component {
 		mPosition.y = y;
 	}
 	
-	public void addX(float x) {
-		mPosition.x += x;
+	public void add(float x, float y) {
+		mPosition.add(x, y);
 	}
 	
-	public void addY(float y) {
-		mPosition.y += y;
+	public Vector2 get() {
+		return mPosition;
 	}
 }
