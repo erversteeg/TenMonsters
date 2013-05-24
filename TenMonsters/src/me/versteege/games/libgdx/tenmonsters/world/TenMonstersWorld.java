@@ -9,6 +9,9 @@ import me.versteege.games.libgdx.tenmonsters.component.AttackCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent;
+import me.versteege.games.libgdx.tenmonsters.component.TileWalkingComponent;
+import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent;
+import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent.TileWalkingState;
 import me.versteege.games.libgdx.tenmonsters.component.WaitCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PlayerComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
@@ -18,10 +21,12 @@ import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateCompo
 import me.versteege.games.libgdx.tenmonsters.system.CameraTrackingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystem;
+import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystemOld;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerMovementSystem;
 import me.versteege.games.libgdx.tenmonsters.system.ShapeRenderingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.SpriteRenderingSystem;
+import me.versteege.games.libgdx.tenmonsters.utils.WorldUtils;
 
 import com.artemis.Entity;
 import com.artemis.World;
@@ -32,26 +37,32 @@ import com.badlogic.gdx.math.Vector2;
 
 public class TenMonstersWorld extends World {
 	
-	private static final int NUM_PATH_TILES = 100;
 	public static final int WORLD_TO_PIXEL = 50;
 	
 	private final PlayerManager mPlayerManager;
 	
-	private final List<Vector2> mTileMap;
+	private final List<Vector2> mTiles;
+	private final List<Vector2> mMonsterPos;
+	
+	private boolean [][] mTileMap;
 	
 	private Direction mPathDirection;
+	
+	private Entity mPlayer;
+	private Vector2 mPlayerPos;
 	
 	public TenMonstersWorld() {
 		super();
 		
 		mPlayerManager = new PlayerManager();
 		
-		mTileMap = new LinkedList<Vector2>();
+		mTiles = new LinkedList<Vector2>();
+		mMonsterPos = new LinkedList<Vector2>();
 		
 		setSystem(new SpriteRenderingSystem());
 		setSystem(new ShapeRenderingSystem());
 		setSystem(new CameraTrackingSystem());
-		setSystem(new PlayerMovementSystem(mTileMap));
+		setSystem(new PlayerMovementSystem());
 		setSystem(new MonsterMovementSystem());
 		setSystem(new MonsterCombatSystem());
 		setSystem(new PlayerCombatSystem());
@@ -63,17 +74,28 @@ public class TenMonstersWorld extends World {
 		super.initialize();
 		
 		generate();
+		adjustTiles();
+		createTiles();
+		createMonsters();
+		populateTileMap();
 		
-		Entity player = createEntity();
-		player.addComponent(new PlayerComponent());
-		player.addComponent(new WaitCooldownComponent());
-		player.addComponent(new CameraFollowComponent());
-		player.addComponent(new PositionComponent(0, 0));
-		player.addComponent(new ShapeComponent(1, 1.5f, new Color(0.0f, 1.0f, 0.0f, 1.0f)));
-		player.addComponent(new HealthComponent(100));
-		player.addToWorld();
+		mPlayer = createEntity();
+		mPlayer.addComponent(new PlayerComponent());
+		mPlayer.addComponent(new WaitCooldownComponent());
+		mPlayer.addComponent(new CameraFollowComponent());
+		mPlayer.addComponent(new PositionComponent(mPlayerPos.x, mPlayerPos.y));
+		mPlayer.addComponent(new ShapeComponent(1, 1.5f, new Color(0.0f, 1.0f, 0.0f, 1.0f)));
+		mPlayer.addComponent(new HealthComponent(100));
+		mPlayer.addToWorld();
 
-		mPlayerManager.setPlayer(player, "player");
+		mPlayerManager.setPlayer(mPlayer, "player");
+		
+		/*System.out.println("Test tile test.");
+		List<Vector2> exclude = new LinkedList<Vector2>();
+		exclude.add(new Vector2(0, 1));
+		exclude.add(new Vector2(1, 0));
+		Vector2 test = WorldUtils.closestTileToPosition(new Vector2(0, 0), new Vector2(-17, -18), exclude, new Vector2());
+		System.out.println(test);*/
 	}
 	
 	public PlayerManager getPlayerManager() {
@@ -89,48 +111,15 @@ public class TenMonstersWorld extends World {
 		
 		while(monsterCount < 10) {
 			
-			Entity pathTile = createEntity();
-			pathTile.addComponent(new PositionComponent(currentPos.x, currentPos.y));
-			pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
-			pathTile.addToWorld();
-			
-			mTileMap.add(new Vector2(currentPos.x, currentPos.y));
-			
-			pathTile = createEntity();
-			pathTile.addComponent(new PositionComponent(currentPos.x + 1, currentPos.y));
-			pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
-			pathTile.addToWorld();
-			
-			mTileMap.add(new Vector2(currentPos.x + 1, currentPos.y));
-			
-			pathTile = createEntity();
-			pathTile.addComponent(new PositionComponent(currentPos.x, currentPos.y + 1));
-			pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
-			pathTile.addToWorld();
-			
-			mTileMap.add(new Vector2(currentPos.x, currentPos.y + 1));
-			
-			pathTile = createEntity();
-			pathTile.addComponent(new PositionComponent(currentPos.x + 1, currentPos.y + 1));
-			pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
-			pathTile.addToWorld();
-			
-			mTileMap.add(new Vector2(currentPos.x + 1, currentPos.y + 1));
+			mTiles.add(new Vector2(currentPos.x, currentPos.y));
+			mTiles.add(new Vector2(currentPos.x + 1, currentPos.y));
+			mTiles.add(new Vector2(currentPos.x, currentPos.y + 1));
+			mTiles.add(new Vector2(currentPos.x + 1, currentPos.y + 1));
 			
 			//////////////////////////////////////////////////
 			
 			if(MathUtils.random() < 0.075f) {
-				Entity monster = createEntity();
-				monster.addComponent(new MonsterComponent());
-				monster.addComponent(new MonsterMovementStateComponent(MovementState.STILL));
-				monster.addComponent(new MonsterCombatStateComponent(CombatState.DORMANT));
-				monster.addComponent(new AttackCooldownComponent());
-				monster.addComponent(new HealthComponent(50));
-				monster.addComponent(new WaitCooldownComponent());
-				monster.addComponent(new PositionComponent(currentPos.x, currentPos.y));
-				monster.addComponent(new ShapeComponent(1, 1.5f, new Color(1.0f, 0.0f, 0.0f, 1.0f)));
-				monster.addToWorld();
-				
+				mMonsterPos.add(new Vector2(currentPos.x, currentPos.y));
 				monsterCount++;
 			}
 			
@@ -161,6 +150,86 @@ public class TenMonstersWorld extends World {
 			
 			lastDirection = nextDirection;
 		}
+	}
+	
+	private void adjustTiles() {
+		
+		float minX = Float.MAX_VALUE;
+		float minY = Float.MIN_VALUE;
+		
+		// find bottom - left tile
+		for(Vector2 tilePos : mTiles) {
+			if(tilePos.x < minX) minX = tilePos.x;
+			if(tilePos.y < minY) minY = tilePos.y;
+		}
+		
+		float tX = minX - 1;
+		float tY = minY - 1;
+		
+		for(Vector2 tilePos : mTiles) {
+			tilePos.sub(tX, tY);
+		}
+		
+		// adjust monsters
+		for(Vector2 monsterPos : mMonsterPos) {
+			monsterPos.sub(tX, tY);
+		}
+		
+		positionPlayer(-tX, -tY);
+	}
+	
+	private void positionPlayer(float x, float y) {
+		mPlayerPos = new Vector2(x, y);
+	}
+	
+	private void createTiles() {
+		
+		for(Vector2 tilePos : mTiles) {
+			Entity pathTile = createEntity();
+			pathTile.addComponent(new PositionComponent(tilePos.x, tilePos.y));
+			pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
+			pathTile.addToWorld();
+		}
+	}
+	
+	private void createMonsters() {
+		
+		for(Vector2 monsterPos : mMonsterPos) {
+			Entity monster = createEntity();
+			monster.addComponent(new MonsterComponent());
+			monster.addComponent(new MonsterMovementStateComponent(MovementState.STILL));
+			monster.addComponent(new MonsterCombatStateComponent(CombatState.DORMANT));
+			monster.addComponent(new TileWalkingStateComponent(TileWalkingState.IDLE));
+			monster.addComponent(new TileWalkingComponent(0.2f));
+			monster.addComponent(new AttackCooldownComponent());
+			monster.addComponent(new HealthComponent(50));
+			monster.addComponent(new WaitCooldownComponent());
+			monster.addComponent(new PositionComponent(monsterPos.x, monsterPos.y));
+			monster.addComponent(new ShapeComponent(1, 1.5f, new Color(1.0f, 0.0f, 0.0f, 1.0f)));
+			monster.addToWorld();
+		}
+	}
+	
+	private void populateTileMap() {
+		
+		// find max tile
+		float maxX = Float.MIN_VALUE;
+		float maxY = Float.MIN_VALUE;
+		
+		for(Vector2 tilePos : mTiles) {
+			if(tilePos.x > maxX) maxX = tilePos.x;
+			if(tilePos.y > maxY) maxY = tilePos.y;
+		}
+		
+		// populate!
+		mTileMap = new boolean [(int) (maxX + 1 + 1)][(int) (maxY + 1 + 1)];
+		for(Vector2 tilePos : mTiles) {
+			mTileMap[(int) tilePos.x][(int) tilePos.y] = true;
+		}
+		
+		getSystem(PlayerMovementSystem.class).setTileMap(mTileMap);
+		getSystem(MonsterMovementSystem.class).setTileMap(mTileMap);
+		getSystem(MonsterCombatSystem.class).setTileMap(mTileMap);
 	}
 	
 	private Direction nextPathDirection() {

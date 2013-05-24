@@ -6,7 +6,7 @@ public class MonsterMovementStateComponent extends Component {
 	
 	public enum MovementState {
 		STILL,
-		ENGAGING
+		MOVING
 	}
 	
 	private MovementState mState;

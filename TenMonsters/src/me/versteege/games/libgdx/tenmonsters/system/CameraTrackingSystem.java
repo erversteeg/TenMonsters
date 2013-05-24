@@ -27,6 +27,7 @@ public class CameraTrackingSystem extends EntityProcessingSystem {
 		float h = Gdx.graphics.getHeight();
 		
 		mCamera = new OrthographicCamera(w / TenMonstersWorld.WORLD_TO_PIXEL, h / TenMonstersWorld.WORLD_TO_PIXEL);
+		mCamera.zoom += 0.2;
 	}
 
 	@Override

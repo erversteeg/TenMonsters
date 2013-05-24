@@ -70,6 +70,12 @@ public class ShapeRenderingSystem extends EntityProcessingSystem {
 		
 		Entity player = ((TenMonstersWorld) world).getPlayerManager().getEntitiesOfPlayer("player").get(0);
 		PositionComponent playerPosition = player.getComponent(PositionComponent.class);
+		
+		if(playerPosition == null) {
+			mShapeRenderer.end();
+			return;
+		}
+		
 		ShapeComponent playerShape = player.getComponent(ShapeComponent.class);
 		
 		mShapeRenderer.setColor(playerShape.getColor());

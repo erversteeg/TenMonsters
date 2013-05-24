@@ -12,6 +12,7 @@ import com.artemis.ComponentType;
 import com.artemis.Entity;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 
 public class PlayerCombatSystem extends EntityProcessingSystem {
 
@@ -31,7 +32,7 @@ public class PlayerCombatSystem extends EntityProcessingSystem {
 		WaitCooldownComponent playerWaitCooldown = player.getComponent(WaitCooldownComponent.class);
 		
 		if(playerPosition.get().dst(position.get()) == 1.0f) {
-			if(Gdx.input.isTouched()) {
+			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				if(playerWaitCooldown.shouldStartAttack()) {
 					HealthComponent healthComponent = entity.getComponent(HealthComponent.class);
 					healthComponent.damage(10);

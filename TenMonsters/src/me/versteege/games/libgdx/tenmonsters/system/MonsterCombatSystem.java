@@ -16,6 +16,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Mapper;
 import com.artemis.systems.EntityProcessingSystem;
+import com.badlogic.gdx.math.Vector2;
 
 public class MonsterCombatSystem extends EntityProcessingSystem {
 
@@ -26,9 +27,14 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 	@Mapper private ComponentMapper<WaitCooldownComponent> mWaitCooldownMapper;
 	@Mapper private ComponentMapper<AttackCooldownComponent> mAttackCooldownMapper;
 	
+	private boolean [][] mTileMap;
+	private final Vector2 mTempTilePos;
+	
 	@SuppressWarnings("unchecked")
 	public MonsterCombatSystem() {
 		super(Aspect.getAspectForAll(MonsterMovementStateComponent.class, PositionComponent.class, ShapeComponent.class, MonsterCombatStateComponent.class, WaitCooldownComponent.class, AttackCooldownComponent.class));
+
+		mTempTilePos = new Vector2();
 	}
 
 	@Override
@@ -51,11 +57,18 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				PositionComponent playerPosition = player.getComponent(PositionComponent.class);
 				
 				// check for adjacent position
-				if(position.get().dst(playerPosition.get()) == 1.0f) {
-					combatState.setState(CombatState.WAITING);
-					waitCooldown.reset();
-					shape.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+				//if(position.get().dst(playerPosition.get()) == 1.0f) {
+				if(canSeePlayer(position, playerPosition)) {
+					combatState.setState(CombatState.ENGAGING);
+					shape.setColor(1.0f, 1.0f, 0.0f, 1.0f);
 				}
+			}
+		}
+		else if(combatState.getState() == CombatState.ENGAGING) {
+			if(movementState.getState() == MovementState.STILL) {
+				combatState.setState(CombatState.WAITING);
+				waitCooldown.reset();
+				shape.setColor(0.0f, 0.0f, 0.0f, 1.0f);
 			}
 		}
 		else if(combatState.getState() == CombatState.WAITING) {
@@ -73,11 +86,12 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				PositionComponent playerPosition = player.getComponent(PositionComponent.class);
 				HealthComponent playerHealth = player.getComponent(HealthComponent.class);
 				
-				System.out.println("Attacked!");
-				
 				if(position.get().dst(playerPosition.get()) == 1.0f) {
-					System.out.println("Player hit!");
 					playerHealth.damage(10);
+					
+					if(playerHealth.isDead()) {
+						player.getComponent(ShapeComponent.class).setColor(1.0f, 1.0f, 1.0f, 0.0f);
+					}
 				}
 				
 				combatState.setState(CombatState.WAITING);
@@ -85,5 +99,70 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				shape.setColor(0.0f, 0.0f, 0.0f, 1.0f);
 			}
 		}
+	}
+	
+	private boolean canSeePlayer(PositionComponent monster, PositionComponent player) {
+		
+		int dx = (int) (player.getX() - monster.getX());
+		int dy = (int) (player.getY() - monster.getY());
+		
+		if(dx == 0 && dy == 0) {
+			return true;
+		}
+		
+		if(dx == 0) {
+			for(int y = (int) monster.getY(); y <= ((int) player.getY()); y++) {
+				//if(!mTileMap.contains(mTempTilePos.set(monster.getX(), y))) {
+				if(!mTileMap[(int) monster.getX()][y]) {
+					return false;
+				}
+			}
+			for(int y = (int) monster.getY(); y >= ((int) player.getY()); y--) {
+				if(!mTileMap[(int) monster.getX()][y]) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		
+		float error = 0;
+		float dError = Math.abs(dy / dx);
+		
+		int y = (int) monster.getY();
+		
+		for(int x = (int) monster.getX(); x <= ((int) player.getX()); x++) {
+			
+			// check tile pos
+			if(!mTileMap[x][y]) {
+				return false;
+			}
+			
+			error += dError;
+			if(error >= 0.5f) {
+				y ++;
+				error -= 1.0f;
+			}
+		}
+		
+		for(int x = (int) monster.getX(); x >= ((int) player.getX()); x--) {
+			
+			// check tile pos
+			if(!mTileMap[x][y]) {
+				return false;
+			}
+			
+			error += dError;
+			if(error >= 0.5f) {
+				y ++;
+				error -= 1.0f;
+			}
+		}
+		
+		return true;
+	}
+	
+	public void setTileMap(boolean [][] tileMap) {
+		mTileMap = tileMap;
 	}
 }

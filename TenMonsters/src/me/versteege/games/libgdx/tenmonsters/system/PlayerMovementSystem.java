@@ -1,7 +1,5 @@
 package me.versteege.games.libgdx.tenmonsters.system;
 
-import java.util.List;
-
 import me.versteege.games.libgdx.tenmonsters.component.PlayerComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
 import me.versteege.games.libgdx.tenmonsters.world.Direction;
@@ -26,7 +24,7 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 	
 	private float mElapsedWait = Float.MAX_VALUE;
 	
-	private final List<Vector2> mTileMap;
+	private boolean [][] mTileMap;
 	private final Vector2 mRequestedPosition;
 	private final Vector2 mMovementPath;
 	private Direction mMovementDirection;
@@ -36,10 +34,9 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 	@Mapper ComponentMapper<PositionComponent> mPositionMapper;
 	
 	@SuppressWarnings("unchecked")
-	public PlayerMovementSystem(List<Vector2> tileMap) {
+	public PlayerMovementSystem() {
 		super(Aspect.getAspectForAll(PlayerComponent.class, PositionComponent.class));
-		
-		mTileMap = tileMap;
+
 		mRequestedPosition = new Vector2(0, 0);
 		mMovementPath = new Vector2();
 		
@@ -79,7 +76,9 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 				}
 			}
 			
-			if(mTileMap.contains(mRequestedPosition) && (mRequestedPosition.x != positionComponent.getX() || mRequestedPosition.y != positionComponent.getY())) {
+			if(mTileMap == null) return;
+			
+			if(mTileMap[(int) mRequestedPosition.x][(int) mRequestedPosition.y] && (mRequestedPosition.x != positionComponent.getX() || mRequestedPosition.y != positionComponent.getY())) {
 				mState = Movement.MOVING;
 				
 				// set direction
@@ -136,5 +135,9 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 			playerPosition.setPosition(requestedPosition.x, requestedPosition.y);
 			mState = Movement.IDLE;
 		}
+	}
+	
+	public void setTileMap(boolean [][] tileMap) {
+		mTileMap = tileMap;
 	}
 }

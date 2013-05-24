@@ -6,6 +6,7 @@ public class MonsterCombatStateComponent extends Component {
 	
 	public enum CombatState {
 		DORMANT,
+		ENGAGING,
 		WAITING,
 		ATTACKING
 	}
