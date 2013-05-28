@@ -30,10 +30,6 @@ public class PositionHistoryComponent extends Component {
 			mHistory.push(temp[i]);
 		}
 		
-		for(Vector2 item : mHistory) {
-			System.out.println(item);
-		}
-		
 		return ret;
 	}
 	

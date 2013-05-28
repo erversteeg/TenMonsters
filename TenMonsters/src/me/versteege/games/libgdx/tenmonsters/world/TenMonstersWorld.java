@@ -235,6 +235,7 @@ public class TenMonstersWorld extends World {
 		getSystem(PlayerMovementSystem.class).setTileMap(mTileMap);
 		getSystem(MonsterMovementSystem.class).setTileMap(mTileMap);
 		getSystem(MonsterCombatSystem.class).setTileMap(mTileMap);
+		getSystem(ShapeRenderingSystem.class).setTileMap(mTileMap);
 	}
 	
 	private Direction nextPathDirection() {
