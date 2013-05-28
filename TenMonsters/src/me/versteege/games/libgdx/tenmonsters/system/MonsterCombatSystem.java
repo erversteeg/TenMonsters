@@ -14,7 +14,6 @@ import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateCompo
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent.TileWalkingState;
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
 import me.versteege.games.libgdx.tenmonsters.utils.WorldUtils;
-import me.versteege.games.libgdx.tenmonsters.world.Direction;
 import me.versteege.games.libgdx.tenmonsters.world.TenMonstersWorld;
 
 import com.artemis.Aspect;
@@ -36,13 +35,10 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 	@Mapper private ComponentMapper<AttackCooldownComponent> mAttackCooldownMapper;
 	
 	private boolean [][] mTileMap;
-	private final Vector2 mTempTilePos;
 	
 	@SuppressWarnings("unchecked")
 	public MonsterCombatSystem() {
 		super(Aspect.getAspectForAll(MonsterMovementStateComponent.class, TileWalkingStateComponent.class, TileWalkingComponent.class, PositionComponent.class, ShapeComponent.class, MonsterCombatStateComponent.class, WaitCooldownComponent.class, AttackCooldownComponent.class));
-
-		mTempTilePos = new Vector2();
 	}
 
 	@Override

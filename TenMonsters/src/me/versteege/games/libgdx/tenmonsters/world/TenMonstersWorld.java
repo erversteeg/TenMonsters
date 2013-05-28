@@ -23,14 +23,11 @@ import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateCompo
 import me.versteege.games.libgdx.tenmonsters.system.CameraTrackingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystem;
-import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystemOld;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerMovementSystem;
 import me.versteege.games.libgdx.tenmonsters.system.rendering.ShapeRenderingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.rendering.SpriteRenderingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.rendering.ZIndexedEntity;
-import me.versteege.games.libgdx.tenmonsters.utils.WorldUtils;
-
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.PlayerManager;

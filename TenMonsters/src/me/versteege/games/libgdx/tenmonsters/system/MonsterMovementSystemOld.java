@@ -27,7 +27,6 @@ public class MonsterMovementSystemOld extends EntityProcessingSystem {
 	@Mapper private ComponentMapper<MonsterCombatStateComponent> mCombatStateMapper;
 	@Mapper private ComponentMapper<TileWalkingStateComponent> mTileWalkingStateMapper;
 	@Mapper private ComponentMapper<TileWalkingComponent> mTileWalkingMapper;
-	@Mapper private ComponentMapper<ShapeComponent> mShapeMapper;
 	
 	private boolean [][] mTileMap;
 	private final Vector2 mTempVector;
@@ -47,7 +46,6 @@ public class MonsterMovementSystemOld extends EntityProcessingSystem {
 		MonsterCombatStateComponent combatState = mCombatStateMapper.get(entity);
 		TileWalkingStateComponent tileWalkingState = mTileWalkingStateMapper.get(entity);
 		TileWalkingComponent tileWalking = mTileWalkingMapper.get(entity);
-		ShapeComponent shapeComponent = mShapeMapper.get(entity);
 		
 		Entity player = ((TenMonstersWorld) world).getPlayerManager().getEntitiesOfPlayer("player").get(0);
 		PositionComponent playerPosition = player.getComponent(PositionComponent.class);
