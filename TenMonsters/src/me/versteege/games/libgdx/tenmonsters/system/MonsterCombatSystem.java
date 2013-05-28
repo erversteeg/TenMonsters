@@ -94,7 +94,6 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 			if(playerPosition.get().equals(position.get())) {
 				
 				Vector2 lastPlayerPos = playerPositionHistory.peek(1);
-				System.out.println(lastPlayerPos);
 				
 				tileWalkingState.setState(TileWalkingState.WALKING);
 				tileWalking.getPath().set(lastPlayerPos).sub(position.get());
@@ -112,7 +111,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				PositionHistoryComponent playerPositionHistory = player.getComponent(PositionHistoryComponent.class);
 				
 				if(position.get().dst(playerPosition.get()) == 1.0f) {
-					playerHealth.damage(10);
+					playerHealth.damage(5);
 					((TenMonstersWorld) world).getPlayerManager().getEntitiesOfPlayer("player").get(1).getComponent(ShapeComponent.class).setWidth(playerHealth.getPercent() * 300.0f);
 					
 					if(playerHealth.isDead()) {
@@ -124,7 +123,6 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				if(playerPosition.get().equals(position.get())) {
 					
 					Vector2 lastPlayerPos = playerPositionHistory.peek(1);
-					System.out.println(lastPlayerPos);
 					
 					tileWalkingState.setState(TileWalkingState.WALKING);
 					tileWalking.getPath().set(lastPlayerPos).sub(position.get());
