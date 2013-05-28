@@ -1,5 +1,6 @@
 package me.versteege.games.libgdx.tenmonsters;
 
+import me.versteege.games.libgdx.tenmonsters.global.SharedGame;
 import me.versteege.games.libgdx.tenmonsters.world.TenMonstersWorld;
 
 import com.badlogic.gdx.Gdx;
@@ -15,18 +16,20 @@ public class GameScreen implements Screen, InputProcessor {
 		mWorld = new TenMonstersWorld();
 		
 		Gdx.input.setInputProcessor(this);
+		
+		SharedGame.gameScreen = this;
 	}
 	
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		mWorld.setDelta(delta);
 		mWorld.process();
 	}
 	
-	private void newGame() {
+	public void newGame() {
 		mWorld = new TenMonstersWorld();
 	}
 

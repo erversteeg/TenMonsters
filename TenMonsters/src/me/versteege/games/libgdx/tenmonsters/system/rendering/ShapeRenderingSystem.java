@@ -3,6 +3,7 @@ package me.versteege.games.libgdx.tenmonsters.system.rendering;
 import java.util.Arrays;
 import java.util.List;
 
+import me.versteege.games.libgdx.tenmonsters.component.HUDComponent;
 import me.versteege.games.libgdx.tenmonsters.component.HealthComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PlayerComponent;
@@ -30,7 +31,7 @@ public class ShapeRenderingSystem extends EntityProcessingSystem {
 	
 	@SuppressWarnings("unchecked")
 	public ShapeRenderingSystem() {
-		super(Aspect.getAspectForAll(PositionComponent.class, ShapeComponent.class).exclude(PlayerComponent.class, MonsterComponent.class));
+		super(Aspect.getAspectForAll(PositionComponent.class, ShapeComponent.class).exclude(PlayerComponent.class, MonsterComponent.class, HUDComponent.class));
 		
 		mShapeRenderer = new ShapeRenderer();
 	}
@@ -79,7 +80,7 @@ public class ShapeRenderingSystem extends EntityProcessingSystem {
 				float yOffset = entityPositionFrequency[(int) positionComponent.getX()][(int) positionComponent.getY()] * 0.2f;
 				
 				mShapeRenderer.setColor(shapeComponent.getColor());
-				mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY() + yOffset * 0.25f, shapeComponent.getWidth(), shapeComponent.getHeight());
+				mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY(), shapeComponent.getWidth(), shapeComponent.getHeight());
 				
 				// health bars
 				HealthComponent healthComponent = zIndexedEntityArray[i].getEntity().getComponent(HealthComponent.class);

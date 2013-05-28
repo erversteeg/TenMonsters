@@ -27,6 +27,10 @@ public class ShapeComponent extends Component {
 		return mWidth;
 	}
 	
+	public void setWidth(float width) {
+		mWidth = width;
+	}
+	
 	public float getHeight() {
 		return mHeight;
 	}

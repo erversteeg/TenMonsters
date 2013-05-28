@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import me.versteege.games.libgdx.tenmonsters.component.CameraFollowComponent;
+import me.versteege.games.libgdx.tenmonsters.component.HUDComponent;
 import me.versteege.games.libgdx.tenmonsters.component.HealthComponent;
 import me.versteege.games.libgdx.tenmonsters.component.AttackCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateComponent;
@@ -25,12 +26,14 @@ import me.versteege.games.libgdx.tenmonsters.system.MonsterCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystem;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerMovementSystem;
+import me.versteege.games.libgdx.tenmonsters.system.rendering.HUDRenderingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.rendering.ShapeRenderingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.rendering.SpriteRenderingSystem;
 import me.versteege.games.libgdx.tenmonsters.system.rendering.ZIndexedEntity;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.PlayerManager;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -61,6 +64,7 @@ public class TenMonstersWorld extends World {
 		
 		setSystem(new SpriteRenderingSystem());
 		setSystem(new ShapeRenderingSystem());
+		setSystem(new HUDRenderingSystem());
 		setSystem(new CameraTrackingSystem());
 		setSystem(new PlayerMovementSystem());
 		setSystem(new MonsterMovementSystem());
@@ -91,11 +95,24 @@ public class TenMonstersWorld extends World {
 		mPlayer.addComponent(new PositionHistoryComponent());
 		mPlayer.addToWorld();
 		
+		Entity playerHealthBarBG = createEntity();
+		playerHealthBarBG.addComponent(new HUDComponent());
+		playerHealthBarBG.addComponent(new ShapeComponent(300.0f, 20.0f, Color.BLACK));
+		playerHealthBarBG.addComponent(new PositionComponent(30.0f, Gdx.graphics.getHeight() - 30.0f - 20.0f));
+		playerHealthBarBG.addToWorld();
+		
+		Entity playerHealthBarFG = createEntity();
+		playerHealthBarFG.addComponent(new HUDComponent());
+		playerHealthBarFG.addComponent(new ShapeComponent(300.0f, 20.0f, new Color(1.0f, 0.0f, 0.0f, 0.5f)));
+		playerHealthBarFG.addComponent(new PositionComponent(30.0f, Gdx.graphics.getHeight() - 30.0f - 20.0f));
+		playerHealthBarFG.addToWorld();
+		
 		zIndexedEntities.add(new ZIndexedEntity(mPlayer));
 		
 		getSystem(ShapeRenderingSystem.class).setZIndexedEntities(zIndexedEntities);
 
 		mPlayerManager.setPlayer(mPlayer, "player");
+		mPlayerManager.setPlayer(playerHealthBarFG, "player");
 	}
 	
 	public PlayerManager getPlayerManager() {

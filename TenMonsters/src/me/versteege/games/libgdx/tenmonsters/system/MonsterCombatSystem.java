@@ -13,6 +13,7 @@ import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateCompone
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent.MovementState;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent.TileWalkingState;
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
+import me.versteege.games.libgdx.tenmonsters.global.SharedGame;
 import me.versteege.games.libgdx.tenmonsters.utils.WorldUtils;
 import me.versteege.games.libgdx.tenmonsters.world.TenMonstersWorld;
 
@@ -112,9 +113,10 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				
 				if(position.get().dst(playerPosition.get()) == 1.0f) {
 					playerHealth.damage(10);
+					((TenMonstersWorld) world).getPlayerManager().getEntitiesOfPlayer("player").get(1).getComponent(ShapeComponent.class).setWidth(playerHealth.getPercent() * 300.0f);
 					
 					if(playerHealth.isDead()) {
-						player.getComponent(ShapeComponent.class).setColor(1.0f, 1.0f, 1.0f, 0.0f);
+						SharedGame.gameScreen.newGame();
 					}
 				}
 				
