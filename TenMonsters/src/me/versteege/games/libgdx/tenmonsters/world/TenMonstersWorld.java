@@ -10,6 +10,7 @@ import me.versteege.games.libgdx.tenmonsters.component.AttackCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent;
+import me.versteege.games.libgdx.tenmonsters.component.PositionHistoryComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent.TileWalkingState;
@@ -90,6 +91,7 @@ public class TenMonstersWorld extends World {
 		mPlayer.addComponent(new PositionComponent(mPlayerPos.x, mPlayerPos.y));
 		mPlayer.addComponent(new ShapeComponent(1, 1.5f, new Color(0.0f, 1.0f, 0.0f, 1.0f)));
 		mPlayer.addComponent(new HealthComponent(100));
+		mPlayer.addComponent(new PositionHistoryComponent());
 		mPlayer.addToWorld();
 		
 		zIndexedEntities.add(new ZIndexedEntity(mPlayer));

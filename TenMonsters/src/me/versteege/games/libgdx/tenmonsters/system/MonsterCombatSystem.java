@@ -4,11 +4,17 @@ import me.versteege.games.libgdx.tenmonsters.component.HealthComponent;
 import me.versteege.games.libgdx.tenmonsters.component.AttackCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent;
+import me.versteege.games.libgdx.tenmonsters.component.PositionHistoryComponent;
+import me.versteege.games.libgdx.tenmonsters.component.TileWalkingComponent;
+import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.WaitCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.ShapeComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateComponent.CombatState;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent.MovementState;
+import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent.TileWalkingState;
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
+import me.versteege.games.libgdx.tenmonsters.utils.WorldUtils;
+import me.versteege.games.libgdx.tenmonsters.world.Direction;
 import me.versteege.games.libgdx.tenmonsters.world.TenMonstersWorld;
 
 import com.artemis.Aspect;
@@ -21,6 +27,8 @@ import com.badlogic.gdx.math.Vector2;
 public class MonsterCombatSystem extends EntityProcessingSystem {
 
 	@Mapper private ComponentMapper<MonsterMovementStateComponent> mMovementStateMapper;
+	@Mapper private ComponentMapper<TileWalkingStateComponent> mTileWalkingStateMapper;
+	@Mapper private ComponentMapper<TileWalkingComponent> mTileWalkingMapper;
 	@Mapper private ComponentMapper<PositionComponent> mPositionMapper;
 	@Mapper private ComponentMapper<ShapeComponent> mShapeMapper;
 	@Mapper private ComponentMapper<MonsterCombatStateComponent> mCombatStateMapper;
@@ -32,7 +40,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 	
 	@SuppressWarnings("unchecked")
 	public MonsterCombatSystem() {
-		super(Aspect.getAspectForAll(MonsterMovementStateComponent.class, PositionComponent.class, ShapeComponent.class, MonsterCombatStateComponent.class, WaitCooldownComponent.class, AttackCooldownComponent.class));
+		super(Aspect.getAspectForAll(MonsterMovementStateComponent.class, TileWalkingStateComponent.class, TileWalkingComponent.class, PositionComponent.class, ShapeComponent.class, MonsterCombatStateComponent.class, WaitCooldownComponent.class, AttackCooldownComponent.class));
 
 		mTempTilePos = new Vector2();
 	}
@@ -40,6 +48,8 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 	@Override
 	protected void process(Entity entity) {
 		MonsterMovementStateComponent movementState = mMovementStateMapper.get(entity);
+		TileWalkingStateComponent tileWalkingState = mTileWalkingStateMapper.get(entity);
+		TileWalkingComponent tileWalking = mTileWalkingMapper.get(entity);
 		PositionComponent position = mPositionMapper.get(entity);
 		ShapeComponent shape = mShapeMapper.get(entity);
 		MonsterCombatStateComponent combatState = mCombatStateMapper.get(entity);
@@ -72,10 +82,27 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 			}
 		}
 		else if(combatState.getState() == CombatState.WAITING) {
+			
+			Entity player = ((TenMonstersWorld) world).getPlayerManager().getEntitiesOfPlayer("player").get(0);
+			PositionComponent playerPosition = player.getComponent(PositionComponent.class);
+			PositionHistoryComponent playerPositionHistory = player.getComponent(PositionHistoryComponent.class);
+			
 			if(waitCooldown.shouldStartAttack()) {
 				combatState.setState(CombatState.ATTACKING);
 				attackCooldown.reset();
 				shape.setColor(0.0f, 1.0f, 1.0f, 1.0f);
+			}
+			
+			// player is on top of monster
+			if(playerPosition.get().equals(position.get())) {
+				
+				Vector2 lastPlayerPos = playerPositionHistory.peek(1);
+				System.out.println(lastPlayerPos);
+				
+				tileWalkingState.setState(TileWalkingState.WALKING);
+				tileWalking.getPath().set(lastPlayerPos).sub(position.get());
+				tileWalking.setDirection(WorldUtils.directionForUnitVector(tileWalking.getPath()));
+				tileWalking.getRequestedPosition().set(lastPlayerPos);
 			}
 		}
 		
@@ -85,6 +112,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				Entity player = ((TenMonstersWorld) world).getPlayerManager().getEntitiesOfPlayer("player").get(0);
 				PositionComponent playerPosition = player.getComponent(PositionComponent.class);
 				HealthComponent playerHealth = player.getComponent(HealthComponent.class);
+				PositionHistoryComponent playerPositionHistory = player.getComponent(PositionHistoryComponent.class);
 				
 				if(position.get().dst(playerPosition.get()) == 1.0f) {
 					playerHealth.damage(10);
@@ -92,6 +120,18 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 					if(playerHealth.isDead()) {
 						player.getComponent(ShapeComponent.class).setColor(1.0f, 1.0f, 1.0f, 0.0f);
 					}
+				}
+				
+				// player is on top of monster
+				if(playerPosition.get().equals(position.get())) {
+					
+					Vector2 lastPlayerPos = playerPositionHistory.peek(1);
+					System.out.println(lastPlayerPos);
+					
+					tileWalkingState.setState(TileWalkingState.WALKING);
+					tileWalking.getPath().set(lastPlayerPos).sub(position.get());
+					tileWalking.setDirection(WorldUtils.directionForUnitVector(tileWalking.getPath()));
+					tileWalking.getRequestedPosition().set(lastPlayerPos);
 				}
 				
 				combatState.setState(CombatState.WAITING);

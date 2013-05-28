@@ -2,6 +2,7 @@ package me.versteege.games.libgdx.tenmonsters.system;
 
 import me.versteege.games.libgdx.tenmonsters.component.PlayerComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
+import me.versteege.games.libgdx.tenmonsters.component.PositionHistoryComponent;
 import me.versteege.games.libgdx.tenmonsters.world.Direction;
 
 import com.artemis.Aspect;
@@ -32,10 +33,11 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 	private Movement mState;
 	
 	@Mapper ComponentMapper<PositionComponent> mPositionMapper;
+	@Mapper ComponentMapper<PositionHistoryComponent> mPositionHistoryMapper;
 	
 	@SuppressWarnings("unchecked")
 	public PlayerMovementSystem() {
-		super(Aspect.getAspectForAll(PlayerComponent.class, PositionComponent.class));
+		super(Aspect.getAspectForAll(PlayerComponent.class, PositionComponent.class, PositionHistoryComponent.class));
 
 		mRequestedPosition = new Vector2(0, 0);
 		mMovementPath = new Vector2();
@@ -47,6 +49,7 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 	protected void process(Entity entity) {
 		
 		PositionComponent positionComponent = mPositionMapper.get(entity);
+		PositionHistoryComponent positionHistory = mPositionHistoryMapper.get(entity);
 		
 		if(mState == Movement.IDLE) {
 			
@@ -101,7 +104,7 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 			}
 		}
 		else if(mState == Movement.MOVING) {
-			move(positionComponent, mRequestedPosition, world.delta);
+			move(positionComponent, mRequestedPosition, world.delta, positionHistory);
 		}
 	}
 	
@@ -112,28 +115,32 @@ public class PlayerMovementSystem extends EntityProcessingSystem {
 		mElapsedWait += world.delta;
 	}
 
-	private void move(PositionComponent playerPosition, Vector2 requestedPosition, float deltaTime) {
+	private void move(PositionComponent playerPosition, Vector2 requestedPosition, float deltaTime, PositionHistoryComponent positionHistory) {
 		playerPosition.add(deltaTime / COOLDOWN_TIME * mMovementPath.x, deltaTime / COOLDOWN_TIME * mMovementPath.y);
 		
 		// left
 		if(mMovementDirection == Direction.LEFT && playerPosition.getX() <= requestedPosition.x) {
 			playerPosition.setPosition(requestedPosition.x, requestedPosition.y);
 			mState = Movement.IDLE;
+			positionHistory.push(new Vector2(requestedPosition.x, requestedPosition.y));
 		}
 		// right
 		else if(mMovementDirection == Direction.RIGHT && playerPosition.getX() >= requestedPosition.x) {
 			playerPosition.setPosition(requestedPosition.x, requestedPosition.y);
 			mState = Movement.IDLE;
+			positionHistory.push(new Vector2(requestedPosition.x, requestedPosition.y));
 		}
 		// up
 		else if(mMovementDirection == Direction.UP && playerPosition.getY() >= requestedPosition.y) {
 			playerPosition.setPosition(requestedPosition.x, requestedPosition.y);
 			mState = Movement.IDLE;
+			positionHistory.push(new Vector2(requestedPosition.x, requestedPosition.y));
 		}
 		// down
 		else if(mMovementDirection == Direction.DOWN && playerPosition.getY() <= requestedPosition.y) {
 			playerPosition.setPosition(requestedPosition.x, requestedPosition.y);
 			mState = Movement.IDLE;
+			positionHistory.push(new Vector2(requestedPosition.x, requestedPosition.y));
 		}
 	}
 	
