@@ -5,6 +5,7 @@ import me.versteege.games.libgdx.tenmonsters.component.MonsterComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PlayerComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
 import me.versteege.games.libgdx.tenmonsters.component.WaitCooldownComponent;
+import me.versteege.games.libgdx.tenmonsters.system.rendering.ShapeRenderingSystem;
 import me.versteege.games.libgdx.tenmonsters.world.TenMonstersWorld;
 
 import com.artemis.Aspect;
@@ -38,6 +39,7 @@ public class PlayerCombatSystem extends EntityProcessingSystem {
 					healthComponent.damage(10);
 					
 					if(healthComponent.isDead()) {
+						world.getSystem(ShapeRenderingSystem.class).removeZIndexedEntity(entity);
 						entity.deleteFromWorld();
 					}
 					

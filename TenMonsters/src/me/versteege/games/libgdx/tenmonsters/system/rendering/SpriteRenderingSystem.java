@@ -1,4 +1,4 @@
-package me.versteege.games.libgdx.tenmonsters.system;
+package me.versteege.games.libgdx.tenmonsters.system.rendering;
 
 import me.versteege.games.libgdx.tenmonsters.component.PositionComponent;
 import me.versteege.games.libgdx.tenmonsters.component.SpriteComponent;

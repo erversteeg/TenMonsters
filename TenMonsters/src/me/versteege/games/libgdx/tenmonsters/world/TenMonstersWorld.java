@@ -1,5 +1,6 @@
 package me.versteege.games.libgdx.tenmonsters.world;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,8 +25,9 @@ import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystemOld;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerMovementSystem;
-import me.versteege.games.libgdx.tenmonsters.system.ShapeRenderingSystem;
-import me.versteege.games.libgdx.tenmonsters.system.SpriteRenderingSystem;
+import me.versteege.games.libgdx.tenmonsters.system.rendering.ShapeRenderingSystem;
+import me.versteege.games.libgdx.tenmonsters.system.rendering.SpriteRenderingSystem;
+import me.versteege.games.libgdx.tenmonsters.system.rendering.ZIndexedEntity;
 import me.versteege.games.libgdx.tenmonsters.utils.WorldUtils;
 
 import com.artemis.Entity;
@@ -73,10 +75,12 @@ public class TenMonstersWorld extends World {
 	public void initialize() {
 		super.initialize();
 		
+		List<ZIndexedEntity> zIndexedEntities = new ArrayList<ZIndexedEntity>(20);
+		
 		generate();
 		adjustTiles();
 		createTiles();
-		createMonsters();
+		createMonsters(zIndexedEntities);
 		populateTileMap();
 		
 		mPlayer = createEntity();
@@ -87,15 +91,12 @@ public class TenMonstersWorld extends World {
 		mPlayer.addComponent(new ShapeComponent(1, 1.5f, new Color(0.0f, 1.0f, 0.0f, 1.0f)));
 		mPlayer.addComponent(new HealthComponent(100));
 		mPlayer.addToWorld();
+		
+		zIndexedEntities.add(new ZIndexedEntity(mPlayer));
+		
+		getSystem(ShapeRenderingSystem.class).setZIndexedEntities(zIndexedEntities);
 
 		mPlayerManager.setPlayer(mPlayer, "player");
-		
-		/*System.out.println("Test tile test.");
-		List<Vector2> exclude = new LinkedList<Vector2>();
-		exclude.add(new Vector2(0, 1));
-		exclude.add(new Vector2(1, 0));
-		Vector2 test = WorldUtils.closestTileToPosition(new Vector2(0, 0), new Vector2(-17, -18), exclude, new Vector2());
-		System.out.println(test);*/
 	}
 	
 	public PlayerManager getPlayerManager() {
@@ -192,7 +193,7 @@ public class TenMonstersWorld extends World {
 		}
 	}
 	
-	private void createMonsters() {
+	private void createMonsters(List<ZIndexedEntity> zIndexedEntities) {
 		
 		for(Vector2 monsterPos : mMonsterPos) {
 			Entity monster = createEntity();
@@ -207,6 +208,8 @@ public class TenMonstersWorld extends World {
 			monster.addComponent(new PositionComponent(monsterPos.x, monsterPos.y));
 			monster.addComponent(new ShapeComponent(1, 1.5f, new Color(1.0f, 0.0f, 0.0f, 1.0f)));
 			monster.addToWorld();
+			
+			zIndexedEntities.add(new ZIndexedEntity(monster));
 		}
 	}
 	
