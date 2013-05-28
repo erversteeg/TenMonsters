@@ -78,7 +78,7 @@ public class TenMonstersWorld extends World {
 		generate();
 		adjustTiles();
 		createTiles();
-		createMonsters(zIndexedEntities);
+		createMonsters(mPlayerPos, zIndexedEntities);
 		populateTileMap();
 		
 		mPlayer = createEntity();
@@ -192,9 +192,14 @@ public class TenMonstersWorld extends World {
 		}
 	}
 	
-	private void createMonsters(List<ZIndexedEntity> zIndexedEntities) {
+	private void createMonsters(Vector2 playerPos, List<ZIndexedEntity> zIndexedEntities) {
 		
 		for(Vector2 monsterPos : mMonsterPos) {
+			
+			while(monsterPos.dst(playerPos) < 10) {
+				monsterPos.set(mMonsterPos.get(MathUtils.random(mMonsterPos.size() - 1)));
+			}
+			
 			Entity monster = createEntity();
 			monster.addComponent(new MonsterComponent());
 			monster.addComponent(new MonsterMovementStateComponent(MovementState.STILL));
