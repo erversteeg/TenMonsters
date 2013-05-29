@@ -65,7 +65,8 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				
 				// check for adjacent position
 				//if(position.get().dst(playerPosition.get()) == 1.0f) {
-				if(canSeePlayer(position, playerPosition)) {
+				//if(canSeePlayer(position, playerPosition)) {
+				if(playerWithinRange(position, playerPosition)) {
 					combatState.setState(CombatState.ENGAGING);
 					shape.setColor(1.0f, 1.0f, 0.0f, 1.0f);
 				}
@@ -111,7 +112,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				PositionHistoryComponent playerPositionHistory = player.getComponent(PositionHistoryComponent.class);
 				
 				if(position.get().dst(playerPosition.get()) == 1.0f) {
-					playerHealth.damage(5);
+					playerHealth.damage(3);
 					((TenMonstersWorld) world).getPlayerManager().getEntitiesOfPlayer("player").get(1).getComponent(ShapeComponent.class).setWidth(playerHealth.getPercent() * 300.0f);
 					
 					if(playerHealth.isDead()) {
@@ -137,6 +138,16 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 		}
 	}
 	
+	private boolean playerWithinRange(PositionComponent monster, PositionComponent player) {
+		if(monster.get().dst(player.get()) < 5.0f) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	@SuppressWarnings("unused")
 	private boolean canSeePlayer(PositionComponent monster, PositionComponent player) {
 		
 		int dx = (int) (player.getX() - monster.getX());

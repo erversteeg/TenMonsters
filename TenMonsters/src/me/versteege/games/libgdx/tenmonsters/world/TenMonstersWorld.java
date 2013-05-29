@@ -12,8 +12,10 @@ import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateCompone
 import me.versteege.games.libgdx.tenmonsters.component.MonsterComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PositionHistoryComponent;
+import me.versteege.games.libgdx.tenmonsters.component.FontComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent;
+import me.versteege.games.libgdx.tenmonsters.component.TimerComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent.TileWalkingState;
 import me.versteege.games.libgdx.tenmonsters.component.WaitCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PlayerComponent;
@@ -22,6 +24,7 @@ import me.versteege.games.libgdx.tenmonsters.component.ShapeComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateComponent.CombatState;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent.MovementState;
 import me.versteege.games.libgdx.tenmonsters.system.CameraTrackingSystem;
+import me.versteege.games.libgdx.tenmonsters.system.GameProgressSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterCombatSystem;
 import me.versteege.games.libgdx.tenmonsters.system.MonsterMovementSystem;
 import me.versteege.games.libgdx.tenmonsters.system.PlayerCombatSystem;
@@ -70,6 +73,7 @@ public class TenMonstersWorld extends World {
 		setSystem(new MonsterMovementSystem());
 		setSystem(new MonsterCombatSystem());
 		setSystem(new PlayerCombatSystem());
+		setSystem(new GameProgressSystem());
 		
 		initialize();
 	}
@@ -98,14 +102,21 @@ public class TenMonstersWorld extends World {
 		Entity playerHealthBarBG = createEntity();
 		playerHealthBarBG.addComponent(new HUDComponent());
 		playerHealthBarBG.addComponent(new ShapeComponent(300.0f, 20.0f, Color.BLACK));
-		playerHealthBarBG.addComponent(new PositionComponent(30.0f, Gdx.graphics.getHeight() - 30.0f - 20.0f));
+		playerHealthBarBG.addComponent(new PositionComponent(15.0f, Gdx.graphics.getHeight() - 15.0f - 20.0f));
 		playerHealthBarBG.addToWorld();
 		
 		Entity playerHealthBarFG = createEntity();
 		playerHealthBarFG.addComponent(new HUDComponent());
 		playerHealthBarFG.addComponent(new ShapeComponent(300.0f, 20.0f, new Color(1.0f, 0.0f, 0.0f, 0.5f)));
-		playerHealthBarFG.addComponent(new PositionComponent(30.0f, Gdx.graphics.getHeight() - 30.0f - 20.0f));
+		playerHealthBarFG.addComponent(new PositionComponent(15.0f, Gdx.graphics.getHeight() - 15.0f - 20.0f));
 		playerHealthBarFG.addToWorld();
+		
+		Entity timer = createEntity();
+		timer.addComponent(new HUDComponent());
+		timer.addComponent(new TimerComponent());
+		timer.addComponent(new FontComponent());
+		timer.addComponent(new PositionComponent(15.0f, Gdx.graphics.getHeight() - 15.0f - 20.0f - 10.0f - 5.0f));
+		timer.addToWorld();
 		
 		zIndexedEntities.add(new ZIndexedEntity(mPlayer));
 		
@@ -113,6 +124,7 @@ public class TenMonstersWorld extends World {
 
 		mPlayerManager.setPlayer(mPlayer, "player");
 		mPlayerManager.setPlayer(playerHealthBarFG, "player");
+		mPlayerManager.setPlayer(timer, "player");
 	}
 	
 	public PlayerManager getPlayerManager() {
@@ -201,11 +213,23 @@ public class TenMonstersWorld extends World {
 	
 	private void createTiles() {
 		
+		int i = 0;
+		
 		for(Vector2 tilePos : mTiles) {
+			
 			Entity pathTile = createEntity();
 			pathTile.addComponent(new PositionComponent(tilePos.x, tilePos.y));
-			pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
+			
+			// end
+			if(i == mTiles.size() - 1) {
+				pathTile.addComponent(new ShapeComponent(1, 1, new Color(0.0f, 0.0f, 1.0f, 1.0f)));
+				getSystem(GameProgressSystem.class).setEndTile(tilePos);
+			}
+			else {
+				pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
+			}
 			pathTile.addToWorld();
+			i++;
 		}
 	}
 	
