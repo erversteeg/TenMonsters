@@ -13,6 +13,7 @@ import me.versteege.games.libgdx.tenmonsters.component.MonsterComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PositionHistoryComponent;
 import me.versteege.games.libgdx.tenmonsters.component.FontComponent;
+import me.versteege.games.libgdx.tenmonsters.component.SpriteComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TimerComponent;
@@ -121,6 +122,7 @@ public class TenMonstersWorld extends World {
 		zIndexedEntities.add(new ZIndexedEntity(mPlayer));
 		
 		getSystem(ShapeRenderingSystem.class).setZIndexedEntities(zIndexedEntities);
+		getSystem(SpriteRenderingSystem.class).setZIndexedEntities(zIndexedEntities);
 
 		mPlayerManager.setPlayer(mPlayer, "player");
 		mPlayerManager.setPlayer(playerHealthBarFG, "player");
@@ -226,7 +228,7 @@ public class TenMonstersWorld extends World {
 				getSystem(GameProgressSystem.class).setEndTile(tilePos);
 			}
 			else {
-				pathTile.addComponent(new ShapeComponent(1, 1, new Color(1.0f, 1.0f, 1.0f, 1.0f)));
+				pathTile.addComponent(new SpriteComponent(Gdx.files.internal("data/world/default_tile.png"), 1, 1));
 			}
 			pathTile.addToWorld();
 			i++;
@@ -251,7 +253,7 @@ public class TenMonstersWorld extends World {
 			monster.addComponent(new HealthComponent(50));
 			monster.addComponent(new WaitCooldownComponent());
 			monster.addComponent(new PositionComponent(monsterPos.x, monsterPos.y));
-			monster.addComponent(new ShapeComponent(1, 1.5f, new Color(1.0f, 0.0f, 0.0f, 1.0f)));
+			monster.addComponent(new SpriteComponent(Gdx.files.internal("data/monster/default_monster.png"), 1.0f, 1.5f));
 			monster.addToWorld();
 			
 			zIndexedEntities.add(new ZIndexedEntity(monster));
@@ -279,6 +281,7 @@ public class TenMonstersWorld extends World {
 		getSystem(MonsterMovementSystem.class).setTileMap(mTileMap);
 		getSystem(MonsterCombatSystem.class).setTileMap(mTileMap);
 		getSystem(ShapeRenderingSystem.class).setTileMap(mTileMap);
+		getSystem(SpriteRenderingSystem.class).setTileMap(mTileMap);
 	}
 	
 	private Direction nextPathDirection() {

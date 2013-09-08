@@ -77,24 +77,26 @@ public class ShapeRenderingSystem extends EntityProcessingSystem {
 				PositionComponent positionComponent = zIndexedEntityArray[i].getEntity().getComponent(PositionComponent.class);
 				ShapeComponent shapeComponent = zIndexedEntityArray[i].getEntity().getComponent(ShapeComponent.class);
 				
-				float yOffset = entityPositionFrequency[(int) positionComponent.getX()][(int) positionComponent.getY()] * 0.2f;
-				
-				mShapeRenderer.setColor(shapeComponent.getColor());
-				mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY(), shapeComponent.getWidth(), shapeComponent.getHeight());
-				
-				// health bars
-				HealthComponent healthComponent = zIndexedEntityArray[i].getEntity().getComponent(HealthComponent.class);
-				if(healthComponent != null) {
-					// background
-					mShapeRenderer.setColor(Color.BLACK);
-					mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY() + shapeComponent.getHeight() + 0.1f + yOffset, shapeComponent.getWidth(), 0.15f);
+				if(shapeComponent != null) {
+					float yOffset = entityPositionFrequency[(int) positionComponent.getX()][(int) positionComponent.getY()] * 0.2f;
 					
-					// foreground
-					mShapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
-					mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY() + shapeComponent.getHeight() + 0.1f + yOffset, shapeComponent.getWidth() * healthComponent.getPercent(), 0.15f);
+					mShapeRenderer.setColor(shapeComponent.getColor());
+					mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY(), shapeComponent.getWidth(), shapeComponent.getHeight());
+					
+					// health bars
+					HealthComponent healthComponent = zIndexedEntityArray[i].getEntity().getComponent(HealthComponent.class);
+					if(healthComponent != null) {
+						// background
+						mShapeRenderer.setColor(Color.BLACK);
+						mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY() + shapeComponent.getHeight() + 0.1f + yOffset, shapeComponent.getWidth(), 0.15f);
+						
+						// foreground
+						mShapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+						mShapeRenderer.rect(positionComponent.getX(), positionComponent.getY() + shapeComponent.getHeight() + 0.1f + yOffset, shapeComponent.getWidth() * healthComponent.getPercent(), 0.15f);
+					}
+					
+					entityPositionFrequency[(int) positionComponent.getX()][(int) positionComponent.getY()]++;
 				}
-				
-				entityPositionFrequency[(int) positionComponent.getX()][(int) positionComponent.getY()]++;
 			}
 		}
 		

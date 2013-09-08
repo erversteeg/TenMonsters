@@ -38,7 +38,7 @@ public class MonsterMovementSystem extends EntityProcessingSystem {
 	
 	@SuppressWarnings("unchecked")
 	public MonsterMovementSystem() {
-		super(Aspect.getAspectForAll(PositionComponent.class, MonsterComponent.class, MonsterMovementStateComponent.class, MonsterCombatStateComponent.class, TileWalkingStateComponent.class, TileWalkingComponent.class, ShapeComponent.class));
+		super(Aspect.getAspectForAll(PositionComponent.class, MonsterComponent.class, MonsterMovementStateComponent.class, MonsterCombatStateComponent.class, TileWalkingStateComponent.class, TileWalkingComponent.class));
 		
 		mTempVector = new Vector2();
 		mVectorList = new LinkedList<Vector2>();

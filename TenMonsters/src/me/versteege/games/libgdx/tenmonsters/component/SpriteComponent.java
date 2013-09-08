@@ -9,6 +9,7 @@ public class SpriteComponent extends Component {
 	
 	private Texture mTexture;
 	private Sprite mSprite;
+	
 	private float mWidth;
 	private float mHeight;
 	
@@ -17,6 +18,8 @@ public class SpriteComponent extends Component {
 		
 		mTexture = new Texture(fileHandle);
 		mSprite = new Sprite(mTexture);
+		
+		mSprite.setScale(width / (float)mTexture.getWidth(), height / (float)mTexture.getHeight());
 		
 		mWidth = width;
 		mHeight = height;

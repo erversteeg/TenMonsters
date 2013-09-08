@@ -5,6 +5,7 @@ import me.versteege.games.libgdx.tenmonsters.component.AttackCooldownComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterCombatStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.MonsterMovementStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.PositionHistoryComponent;
+import me.versteege.games.libgdx.tenmonsters.component.SpriteComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingComponent;
 import me.versteege.games.libgdx.tenmonsters.component.TileWalkingStateComponent;
 import me.versteege.games.libgdx.tenmonsters.component.WaitCooldownComponent;
@@ -30,7 +31,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 	@Mapper private ComponentMapper<TileWalkingStateComponent> mTileWalkingStateMapper;
 	@Mapper private ComponentMapper<TileWalkingComponent> mTileWalkingMapper;
 	@Mapper private ComponentMapper<PositionComponent> mPositionMapper;
-	@Mapper private ComponentMapper<ShapeComponent> mShapeMapper;
+	@Mapper private ComponentMapper<SpriteComponent> mSpriteMapper;
 	@Mapper private ComponentMapper<MonsterCombatStateComponent> mCombatStateMapper;
 	@Mapper private ComponentMapper<WaitCooldownComponent> mWaitCooldownMapper;
 	@Mapper private ComponentMapper<AttackCooldownComponent> mAttackCooldownMapper;
@@ -39,7 +40,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 	
 	@SuppressWarnings("unchecked")
 	public MonsterCombatSystem() {
-		super(Aspect.getAspectForAll(MonsterMovementStateComponent.class, TileWalkingStateComponent.class, TileWalkingComponent.class, PositionComponent.class, ShapeComponent.class, MonsterCombatStateComponent.class, WaitCooldownComponent.class, AttackCooldownComponent.class));
+		super(Aspect.getAspectForAll(MonsterMovementStateComponent.class, TileWalkingStateComponent.class, TileWalkingComponent.class, PositionComponent.class, SpriteComponent.class, MonsterCombatStateComponent.class, WaitCooldownComponent.class, AttackCooldownComponent.class));
 	}
 
 	@Override
@@ -48,7 +49,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 		TileWalkingStateComponent tileWalkingState = mTileWalkingStateMapper.get(entity);
 		TileWalkingComponent tileWalking = mTileWalkingMapper.get(entity);
 		PositionComponent position = mPositionMapper.get(entity);
-		ShapeComponent shape = mShapeMapper.get(entity);
+		SpriteComponent sprite = mSpriteMapper.get(entity);
 		MonsterCombatStateComponent combatState = mCombatStateMapper.get(entity);
 		WaitCooldownComponent waitCooldown = mWaitCooldownMapper.get(entity);
 		AttackCooldownComponent attackCooldown = mAttackCooldownMapper.get(entity);
@@ -68,7 +69,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				//if(canSeePlayer(position, playerPosition)) {
 				if(playerWithinRange(position, playerPosition)) {
 					combatState.setState(CombatState.ENGAGING);
-					shape.setColor(1.0f, 1.0f, 0.0f, 1.0f);
+					//shape.setColor(1.0f, 1.0f, 0.0f, 1.0f);
 				}
 			}
 		}
@@ -76,7 +77,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 			if(movementState.getState() == MovementState.STILL) {
 				combatState.setState(CombatState.WAITING);
 				waitCooldown.reset();
-				shape.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+				//shape.setColor(0.0f, 0.0f, 0.0f, 1.0f);
 			}
 		}
 		else if(combatState.getState() == CombatState.WAITING) {
@@ -88,7 +89,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 			if(waitCooldown.shouldStartAttack()) {
 				combatState.setState(CombatState.ATTACKING);
 				attackCooldown.reset();
-				shape.setColor(0.0f, 1.0f, 1.0f, 1.0f);
+				//shape.setColor(0.0f, 1.0f, 1.0f, 1.0f);
 			}
 			
 			// player is on top of monster
@@ -133,7 +134,7 @@ public class MonsterCombatSystem extends EntityProcessingSystem {
 				
 				combatState.setState(CombatState.WAITING);
 				waitCooldown.reset();
-				shape.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+				//shape.setColor(0.0f, 0.0f, 0.0f, 1.0f);
 			}
 		}
 	}
